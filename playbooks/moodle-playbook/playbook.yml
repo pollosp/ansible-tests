@@ -1,0 +1,61 @@
+---
+- hosts: moodle
+  sudo: True
+  vars_files:
+    - vars/users.yml
+
+  tasks:
+  - name: update apt
+    apt: update_cache=yes cache_valid_time=3600
+  - name: install various packages
+    apt: pkg=$item state=present
+    with_items:
+      - apache2
+      - php5
+      - mysql-server
+      - mysql-client
+      - php5-mysql
+      - git
+      - python-mysqldb
+      - php5-gd
+      - php5-curl
+      - php5-intl
+      - php5-xmlrpc
+      - build-essential
+      - libcurl4-openssl-dev
+      - libxml2-dev
+      - libssl-dev
+      - libfuse-dev
+      - unzip
+
+  - name: Download Moodle
+    get_url: url=https://download.moodle.org/download.php/direct/stable30/moodle-3.0.2.zip dest=/tmp/moodle.tgz validate_certs=no
+
+  - name: Extract Moodle
+    unarchive: src=/tmp/moodle.tgz dest=/var/www/ copy=no
+    sudo: yes
+  - name: Set permissions in moodle directory
+    file: dest=/var/www/moodle state=directory
+         owner=www-data group=root
+         mode=0770
+         recurse=yes
+    sudo: yes
+  - name: Create moodle data directory
+    file: path=/var/www/moodledata
+         state=directory
+         owner=www-data group=root
+         mode=0770
+  - name: Update default Apache site
+    sudo: yes
+    lineinfile:
+     dest=/etc/apache2/sites-enabled/000-default.conf
+     regexp="(.)+DocumentRoot /var/www/html"
+     line="DocumentRoot /var/www/moodle"
+    notify:
+     - restart apache
+
+  - name: create moodle database
+    mysql_db: name=moodle state=present encoding=utf8
+
+  - name: setup mysql user
+    mysql_user: name={{ mysql_user }} password={{ mysql_pass }} priv=moodle.*:ALL state=present
