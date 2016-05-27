@@ -1,0 +1,35 @@
+---
+- hosts: digitalocean
+  
+  vars_files:
+    - vars/credentials.yml
+  
+  tasks:
+
+  - name: ensure ssh key exists
+    user: >
+      name={{ ansible_user_id }}
+      generate_ssh_key=yes
+      ssh_key_file=.ssh/id_rsa-do
+
+  - name: ensure key exists at DigitalOcean
+    digital_ocean: >
+      state=present
+      command=ssh
+      name=my_ssh_key_for_hiszpanski
+      ssh_pub_key={{ lookup('file', '~/.ssh/id_rsa-do.pub') }}
+      api_token={{ digital_ocean_api_key }}
+    register: my_ssh_key_for_hiszpanski
+   
+  - name: ensure droplet for hiszpanski na luzie exists
+    digital_ocean: >
+      state=present
+      command=droplet
+      name=hiszpanski-wp-centos
+      unique_name=yes
+      size_id=512mb
+      region_id=fra1
+      image_id=centos-7-2-x64
+      ssh_key_ids={{ my_ssh_key_for_hiszpanski.ssh_key.id }}
+      api_token={{ digital_ocean_api_key }}
+    register: hiszpanski-wp-centos
