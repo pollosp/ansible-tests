@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  remote_user: root
+
+  vars:
+    # Use restart.
+
+  pre_tasks:
+    - name: Update apt cache if needed.
+      apt: update_cache=yes cache_valid_time=3600
+
+  roles:
+    - common
+    - mariadb
+    - nginx
+    - php-fpm
+    - wordpress
+    - postfix-smarthost
+    - s3cmd
+    - backups

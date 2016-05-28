@@ -1,0 +1,22 @@
+---
+sudo: required
+language: python
+python: "2.7"
+
+before_install:
+  - sudo apt-get update -qq
+
+install:
+  # Install Ansible.
+  - pip install ansible
+
+  # Add ansible.cfg to pick up roles path.
+  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+
+script:
+  # Check the role/playbook's syntax.
+  - "ansible-playbook -i playbooks/wordpress-hiszpanskinaluzie.pl/wordpress-nginx_rhel7/test/inventory playbooks/wordpress-hiszpanskinaluzie.pl/wordpress-nginx_rhel7/test_roles.yml --syntax-check"
+
+  # Run the role/playbook with ansible-playbook.
+  #only for CENTOS
+  #- "ansible-playbook -i playbooks/wordpress-hiszpanskinaluzie.pl/wordpress-nginx_rhel7/test/inventory playbooks/wordpress-hiszpanskinaluzie.pl/wordpress-nginx_rhel7/test_roles.yml --connection=local --sudo"
