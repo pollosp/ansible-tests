@@ -1,0 +1,9 @@
+---
+- name: Creates Backup script directory
+  file: path=/root/backup/ state=directory owner=root group=root mode=0700 
+
+- name: Creates backup config file 
+  template: src=backup.sh dest=/root/backup/backup.sh owner=root group=root mode=0770
+
+- name: Set crond for backup 
+  cron: name="backup wordpress" minute="0" hour="23" job="/root/backup/backup.sh"

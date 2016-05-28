@@ -13,3 +13,4 @@
     - wordpress
     - postfix-smarthost
     - s3cmd
+    - backups
