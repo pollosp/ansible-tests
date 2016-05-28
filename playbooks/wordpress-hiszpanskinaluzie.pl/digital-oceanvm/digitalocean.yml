@@ -25,11 +25,13 @@
     digital_ocean: >
       state=present
       command=droplet
-      name=hiszpanski-wp-centos
+      name=hiszpanskiwp
       unique_name=yes
       size_id=512mb
       region_id=fra1
       image_id=centos-7-2-x64
       ssh_key_ids={{ my_ssh_key_for_hiszpanski.ssh_key.id }}
       api_token={{ digital_ocean_api_key }}
-    register: hiszpanski-wp-centos
+    register: hiszpanskiwp
+
+  - debug: msg="IP is {{ hiszpanskiwp.droplet.ip_address }}"

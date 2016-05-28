@@ -1,0 +1,6 @@
+---
+- name: Installs S3cmd
+  yum: name=s3cmd state=present
+
+- name: S3config for root
+  template: src=s3cfg dest=/root/.s3cfg

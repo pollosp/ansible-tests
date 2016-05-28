@@ -1,0 +1,32 @@
+---
+- name: Install Postfix 
+  yum: name=postfix state=present
+
+- name: Installs Postfix dependences 
+  yum: name={{item}} state=present
+  with_items:
+       - cyrus-sasl-plain 
+       - mailx
+       - cyrus-sasl-lib
+       - cyrus-sasl-md5
+       - cyrus-sasl-gssapi
+
+- name: Copy main.cf
+  template: src=main.cf dest=/etc/postfix/main.cf
+  notify: restart postfix
+
+- name: Copy sasl_passwd 
+  template: src=sasl_passwd dest=/etc/postfix/sasl_passwd
+
+- name: Postmap 
+  command: postmap /etc/postfix/sasl_passwd
+
+- name: Set sasl_passwd permissions
+  file: path={{item}} owner=root group=postfix mode=0640
+  with_items:
+       - /etc/postfix/sasl_passwd
+       - /etc/postfix/sasl_passwd.db   
+  notify: restart postfix
+
+- name: postfix service state
+  service: name=postfix state=started enabled=yes
